@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro: Pessoais</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif; margin: 0; color: white;
+            background-image: url("{{ url_for('static', filename='fundo.jpg') }}");
+            background-size: cover; background-position: center; background-attachment: fixed;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); z-index: 1; }
+        .card {
+            position: relative; z-index: 2; width: 90%; max-width: 500px;
+            padding: 30px 40px; background: rgba(30, 30, 30, 0.9);
+            border-radius: 10px; backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        h2 { font-size: 2.2em; margin-bottom: 25px; color: #ffc107; text-align: center; }
+        form { display: flex; flex-direction: column; }
+        input {
+            padding: 12px; margin-bottom: 15px; font-size: 1em; border: 2px solid #555;
+            border-radius: 8px; background: #222; color: white; outline: none;
+            transition: border-color 0.3s;
+        }
+        input:focus { border-color: #ffc107; }
+        label { font-weight: bold; margin-bottom: 5px; font-size: 0.9em; }
+        button {
+            padding: 15px; font-size: 1.2em; font-weight: bold; cursor: pointer;
+            background: #ffc107; color: #333; border: none; border-radius: 8px;
+            transition: background 0.3s; margin-top: 10px;
+        }
+        button:hover { background: #e0a800; }
+        .erros { list-style: none; padding: 0; margin-bottom: 15px; }
+        .erros li {
+            color: #f8d7da; background-color: #721c24; padding: 10px;
+            border-radius: 5px; margin-bottom: 5px; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="card">
+        <h2>Dados Pessoais</h2>
+        {% if erros %}
+            <ul class="erros">
+                {% for erro in erros %}
+                    <li>{{ erro }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form action="/" method="POST">
+            <label for="nome">Nome Completo:</label>
+            <input type="text" id="nome" name="nome" value="{{ form_data.nome or '' }}" required>
+            <label for="ano_nascimento">Ano de Nascimento (AAAA):</label>
+            <input type="text" id="ano_nascimento" name="ano_nascimento" value="{{ form_data.ano_nascimento or '' }}" required>
+            <button type="submit">Avançar &rarr;</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz de Futebol</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif; margin: 0; color: white;
+            background-image: url("{{ url_for('static', filename='fundo.jpg') }}");
+            background-size: cover; background-position: center; background-attachment: fixed;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); z-index: 1; }
+        .card {
+            position: relative; z-index: 2; width: 90%; max-width: 700px;
+            padding: 0; /* Removido padding para o header caber */
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 10px; backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); text-align: center;
+            overflow: hidden; /* Garante que o header fique dentro */
+        }
+        .header {
+            width: 100%;
+            padding: 15px 40px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #ffc107; /* Borda dourada */
+            box-sizing: border-box; /* Importante */
+        }
+        .header h4 { margin: 0; font-size: 1.2em; color: #eee; }
+        .header a { color: #ffc107; text-decoration: none; font-weight: bold; }
+        
+        /* Conteúdo do Card */
+        .card-content { padding: 0 40px 30px 40px; }
+        
+        .opcao {
+            display: block; width: 100%; box-sizing: border-box;
+            padding: 15px; margin: 10px 0; font-size: 1.1em; font-weight: bold;
+            cursor: pointer; color: white; background: #007bff;
+            border: none; border-radius: 8px; transition: all 0.3s;
+        }
+        .opcao:hover { background: #0056b3; }
+        .mensagem {
+            font-weight: bold; margin: 20px 0; padding: 15px;
+            border-radius: 10px; font-size: 1.2em;
+        }
+        .correta { color: #d4edda; background-color: #155724; border: 1px solid #c3e6cb; }
+        .errada { color: #f8d7da; background-color: #721c24; border: 1px solid #f5c6cb; }
+        .info {
+            display: flex; justify-content: space-between; font-size: 1.2em;
+            font-weight: bold; margin: 20px 0; padding: 10px;
+            background: rgba(0, 0, 0, 0.3); border-radius: 10px;
+        }
+        h4.pergunta { font-size: 1.4em; margin: 25px 0; min-height: 50px; }
+        .btn-proxima {
+            padding: 15px 30px; font-size: 1.2em; font-weight: bold;
+            background-color: #28a745; color: white; text-decoration: none;
+            border-radius: 10px; transition: background 0.3s;
+        }
+        .btn-proxima:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="card">
+        <div class="header">
+            <h4>Olá, {{ session.nome_usuario }}!</h4>
+            <a href="/logout">Sair (Recomeçar)</a>
+        </div>
+        
+        <div class="card-content">
+            {% if mensagem_anterior %}
+                <div class="info">
+                    <span>Pontuação: {{ pontos }}</span>
+                    <span>Pergunta {{ num_pergunta -1 }} de 5</span>
+                </div>
+                
+                {% if foi_correto %}
+                    <div class="mensagem correta">{{ mensagem_anterior }}</div>
+                {% else %}
+                    <div class="mensagem errada">{{ mensagem_anterior }}</div>
+                {% endif %}
+                
+                <a href="{{ redirect_url }}" class="btn-proxima">Próxima Pergunta &rarr;</a>
+            
+            {% else %}
+                <div class="info">
+                    <span>Pontuação: {{ pontos }}</span>
+                    <span>Pergunta {{ num_pergunta }} de 5</span>
+                </div>
+                
+                <h4 class="pergunta">P: {{ pergunta }}</h4>
+
+                <form action="/responder_quiz" method="POST">
+                    {% for opcao in opcoes %}
+                        <button class="opcao" type="submit" name="opcao" value="{{ opcao }}">{{ opcao }}</button>
+                    {% endfor %}
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

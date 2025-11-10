@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votação</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+            padding: 0;
+            margin: 0;
+            background-image: url("{{ url_for('static', filename='fundo.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .overlay {
+            width: 100%;
+            min-height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            padding-bottom: 50px;
+        }
+        h1 {
+            margin-top: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+        }
+        .buttons {
+            margin: 30px auto;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        button {
+            padding: 15px 25px;
+            font-size: 1.2em;
+            border: 2px solid white;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            transition: 0.3s;
+            font-weight: bold;
+            min-width: 150px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255,255,255,0.3);
+        }
+        #Corinthians { background-color: #000000; }
+        #Palmeiras { background-color: #006437; }
+        #SãoPaulo { background-color: #da1414; }
+        #Santos { background-color: #ffffff; color: #000000; border-color: black; }
+        
+        .chart-container {
+            width: 90%;
+            max-width: 700px;
+            margin: 50px auto;
+            background: rgba(30, 30, 30, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header {
+            padding: 15px;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #ffc107; /* Borda dourada */
+        }
+        .header h3 { margin: 0; color: white; font-size: 1.1em; }
+        .header a {
+            color: #ffc107;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+        
+        .voted-message {
+            margin: 30px auto;
+            padding: 30px;
+            max-width: 500px;
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+        }
+        .voted-message h3 {
+            margin-top: 0;
+            font-size: 1.8em;
+            color: #ffc107;
+        }
+        .voted-message p {
+            font-size: 1.2em;
+            color: #eee;
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <div class="header">
+        <h3>Olá, {{ session.nome_usuario }}!</h3>
+        <a href="/logout">Sair (Recomeçar)</a>
+    </div>
+    
+    <div class="overlay">
+        <h1>⚽ Vote no seu time do coração ⚽</h1>
+
+        {% if has_voted %}
+            <div class="voted-message">
+                <h3>Obrigado pelo seu voto!</h3>
+                <p>Seu voto foi computado com sucesso.</p>
+            </div>
+        {% else %}
+            <div class="buttons">
+                <button id="Corinthians" onclick="votar('Corinthians')">Corinthians</button>
+                <button id="Palmeiras" onclick="votar('Palmeiras')">Palmeiras</button>
+                <button id="SãoPaulo" onclick="votar('São Paulo')">São Paulo</button>
+                <button id="Santos" onclick="votar('Santos')">Santos</button>
+            </div>
+        {% endif %} <div class="chart-container">
+            <canvas id="chartVotos"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('chartVotos').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Corinthians', 'Palmeiras', 'São Paulo', 'Santos'],
+                datasets: [{
+                    label: 'Votos',
+                    data: [
+                        {{ votos.Corinthians }}, 
+                        {{ votos.Palmeiras }}, 
+                        {{ votos['São Paulo'] }}, 
+                        {{ votos.Santos }}
+                    ],
+                    backgroundColor: ['#000000', '#006437', '#da1414', '#ffffff'],
+                    borderColor: ['#333', '#333', '#333', '#333'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#eee',
+                            callback: function(value) { if (value % 1 === 0) { return value; } },
+                            stepSize: 1
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#eee', weight: 'bold' },
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Resultado Parcial',
+                        color: '#ffffff',
+                        font: { size: 18, weight: 'bold' }
+                    }
+                }
+            }
+        });
+
+        function votar(time) {
+            const formData = new FormData();
+            formData.append('time', time);
+            fetch('/votar', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error); 
+                        
+                        if (data.error.includes("expirou")) {
+                            window.location.href = "/";
+                        }
+                    } else {
+                        // SUCESSO! Recarrega a página.
+                        window.location.reload();
+                    }
+                })
+        }
+    </script>
+
+</body>
+</html>

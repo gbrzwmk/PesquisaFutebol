@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Quiz Concluído!</title>
+
+    <style>
+
+        body {
+
+            font-family: Arial, sans-serif; margin: 0; color: white;
+
+            background-image: url("{{ url_for('static', filename='fundo.jpg') }}");
+
+            background-size: cover; background-position: center; background-attachment: fixed;
+
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+
+        }
+
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); z-index: 1; }
+
+        .card {
+
+            position: relative; z-index: 2; width: 90%; max-width: 600px;
+
+            padding: 0; /* Removido padding */
+
+            background: rgba(30, 30, 30, 0.9);
+
+            border-radius: 10px; backdrop-filter: blur(5px);
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
+
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); text-align: center;
+
+            overflow: hidden; /* Garante que o header fique dentro */
+
+        }
+
+        .header {
+
+            width: 100%;
+
+            padding: 15px 40px;
+
+            margin-bottom: 30px;
+
+            background: rgba(0,0,0,0.6);
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            border-bottom: 3px solid #ffc107; /* Borda dourada */
+
+            box-sizing: border-box; /* Importante */
+
+        }
+
+        .header h3 { margin: 0; font-size: 1.2em; color: #eee; }
+
+        .header a { color: #ffc107; text-decoration: none; font-weight: bold; }
+
+       
+
+        /* Conteúdo do Card */
+
+        .card-content { padding: 0 40px 40px 40px; }
+
+       
+
+        h1 {
+
+            color: #ffc107;
+
+            font-size: 4.5em;
+
+            margin: 10px 0;
+
+        }
+
+        h2 { font-size: 2em; color: #eee; }
+
+        h3 { font-size: 1.3em; color: #ccc; }
+
+        .nav-links { margin-top: 30px; }
+
+        .nav-links a {
+
+            color: white; background-color: #28a745;
+
+            padding: 15px 25px; border-radius: 10px; text-decoration: none;
+
+            margin: 0 10px; font-weight: bold; font-size: 1.2em;
+
+            transition: background 0.3s;
+
+        }
+
+        .nav-links a:hover { background-color: #218838; }
+
+        .logout { font-size: 1em; margin-top: 25px; }
+
+        .logout a { color: #ffc107; text-decoration: none; }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="overlay"></div>
+
+    <div class="card">
+
+       
+
+        <div class="header">
+
+            <h3>Parabéns, {{ session.nome_usuario }}!</h3>
+
+            <a href="/logout">Sair (Recomeçar)</a>
+
+        </div>
+
+       
+
+        <div class="card-content">
+
+            <h2>Quiz Concluído!</h2>
+
+            <h3>Sua pontuação final foi:</h3>
+
+            <h1>{{ pontos }} de {{ total }}</h1>
+
+           
+
+            <div class="nav-links">
+
+                <a href="/votacao">Avançar para a Votação</a>
+
+            </div>
+
+           
+
+            <div class="logout">
+
+                <a href="/logout">Sair (Recomeçar)</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
